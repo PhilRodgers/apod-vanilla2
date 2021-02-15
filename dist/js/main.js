@@ -10872,99 +10872,88 @@ return jQuery;
 } );
 
 var apod = {
-    //Create a random date
-    randomDate: function(start, end) {
-      //Randomize the date https://gist.github.com/miguelmota/5b67e03845d840c949c4
-      let date = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 
-      //Format the date
-      let d = date.getDate();
-      let m = date.getMonth() + 1; //In JS months start at 0
-      let y = date.getFullYear();
+  randomDate: function(start, end){
+    let date = new Date(
+      start.getTime() + Math.random() *
+        (end.getTime() - start.getTime())
+    );
 
-      //Change the month and day strings so that they match the documented format.
-      if(m < 10){
-        m = '0'+m
-      }
+    //let date = new Date(2013,5,6);
+    //let date = new Date(1998,4,30);
 
-      if(d < 10){
-        d = '0'+d
-      }
+    //Format the date
+    let d = date.getDate();
+    let m = date.getMonth() + 1;
+    let y = date.getFullYear();
 
-      return `${y}-${m}-${d}`;
-    },
-
-    //Injects the results of the API call into the DOM
-    /*
-    buildDOM: function(result) {
-    $("#apodTitle").text(result.title);
-  
-    if(result.media_type === 'video') {
-      $("#apodImage").hide();
-      $("#apodVideo > iframe").attr("src", result.url).show();
-    }else{
-      $("#apodVideo").hide();
-      $("#apodImg").attr("src", result.url).attr('alt', result.title).show();
+    if(m<10){
+      m='0'+m;
     }
-  
-    $("#apodCopyright").text("Copyright: " + result.copyright);
-    $("#apodDate").text("Date: " + result.date);
-    $("#apodDesc").text(result.explanation);
 
-    */
-
-   buildDOM: function(result) {
-    document.querySelector("#apodTitle").text(result.title);
-  
-    if(result.media_type === 'video') {
-      document.querySelector("#apodImage").hide();
-      document.querySelector("#apodVideo > iframe").attr("src", result.url).show();
-    }else{
-      document.querySelector("#apodVideo").hide();
-      document.querySelector("#apodImg").attr("src", result.url).attr('alt', result.title).show();
+    if(d<10){
+      d='0'+d;
     }
-  
-    document.querySelector("#apodCopyright").text("Copyright: " + result.copyright);
-    document.querySelector("#apodDate").text("Date: " + result.date);
-    document.querySelector("#apodDesc").text(result.explanation);
-  
+
+    return `${y}-${m}-${d}`;
   },
-  
-  //Executes an AJAX call to an API.
+
+  buildDOM: function(result){
+    document.querySelector('#apodTitle').innerHTML = result.title;
+
+    if(result.media_type === 'video'){
+      document.querySelector('#apodImg').style.display='none';
+      let avi = document.querySelector('#apodVideo > iframe');
+      avi.src=result.url;
+      document.querySelector('#apodVideo').style.display='block';
+    }else{
+      document.querySelector('#apodVideo').style.display='none';
+      let ai = document.querySelector('#apodImg');
+      ai.src=result.url;
+      ai.style.display='block';
+    }
+
+    if(result.copyright!=undefined){
+      document.querySelector('#apodCopyright').innerHTML = 'Copyright: ' + result.copyright;
+    }
+
+    document.querySelector('#apodDate').innerHTML = 'Date: ' + result.date;
+    document.querySelector('#apodDesc').innerHTML = result.explanation;
+  },
+
   getRequest: function() {
-    let _this = this;
-    let date = this.randomDate(new Date(1995, 5, 16), new Date());
-    let url = "https://api.nasa.gov/planetary/apod?api_key=PLEUo477tBdv6wHluWPSrh3yNRoNXO6ir9tZVTk6&date=" + date;
-    $.ajax({
-        url: url
-    }).done(function(result){
-        _this.buildDOM(result);
-    }).fail(function(result){
-      console.log(result);
-    });
-  },
-  
-  // Initialization method.
-  init: function() {
-    this.getRequest();
-  },
-  
-};
 
+      let date = this.randomDate(new Date(1995,5,16), new Date());
+      let key = 'PLEUo477tBdv6wHluWPSrh3yNRoNXO6ir9tZVTk6';
+      var url = `https://api.nasa.gov/planetary/apod?api_key=${key}&date=${date}`;
+      let _this = this;
+
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', url);
+      xhr.send();
+
+      xhr.onload = function(){
+        let result = JSON.parse(xhr.response);
+
+        _this.buildDOM(result);
+      }
+  },
+
+  init: function(){
+    this.getRequest();
+  }
+};
 
 apod.init();
 
-/* https://learn.jquery.com/using-jquery-core/document-ready/ */
-/*
-$(function() {
-    $('#btnRandApod').on('click',function(){
-      apod.getRequest();
-    });
-});
-*/
 
-document.querySelector(function() {
-  document.querySelector('#btnRandApod').addEventListener('click',function(){
-    apod.getRequest();
-  });
+document.querySelector('#btnRandApod').addEventListener('click', function(){
+  apod.getRequest();
 });
+
+
+
+
+
+
